@@ -4,8 +4,8 @@ import litLogo from "./assets/lit.svg";
 
 import { getMovieList } from "./movies.ts";
 
-@customElement("my-element")
-export class MyElement extends LitElement {
+@customElement("movie-list")
+export class MovieList extends LitElement {
   @property({ type: Array })
   movieList: Movie[] = [];
 
@@ -149,11 +149,11 @@ export class MyElement extends LitElement {
       }
     }
   `;
-  static styles = [MyElement.globalStyles, MyElement.movieStyles];
+  static styles = [MovieList.globalStyles, MovieList.movieStyles];
 }
 
 declare global {
   interface HTMLElementTagNameMap {
-    "my-element": MyElement;
+    "movie-list": MovieList;
   }
 }
