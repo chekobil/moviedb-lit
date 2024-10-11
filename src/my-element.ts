@@ -22,10 +22,14 @@ export class MyElement extends LitElement {
   };
 
   getMovieCard = (movie: Movie) => {
+    const rating = parseFloat(movie.vote_average.toFixed(1));
     return html`
       <div class="movie-card">
         <img src="${this.getImagePath(movie.poster_path)}" />
-        <div class="movie-title">${movie.title}</div>
+        <div class="movie-title">
+          <span class="title">${movie.title}</span>
+          <span class="rating">${rating}</span>
+        </div>
       </div>
     `;
   };
@@ -37,8 +41,6 @@ export class MyElement extends LitElement {
           <img src=${litLogo} class="logo lit" alt="Lit logo" />
         </a>
       </div>
-      <slot></slot>
-      <p class="read-the-docs">movies:${this.movieList?.length ?? 0}</p>
       <ul class="movie-list-container">
         ${this.movieList.map((movie) => this.getMovieCard(movie))}
       </ul>
@@ -49,17 +51,31 @@ export class MyElement extends LitElement {
     .movie-list-container {
       display: flex;
       flex-wrap: wrap;
-      gap: 1.2rem;
+      gap: 1.4rem;
     }
     .movie-card {
-      border: 2px solid green;
+      border: 1px solid #dbdbdb;
       border-radius: 12px;
-      max-width: 260px;
+      max-width: 200px;
       overflow: hidden;
-    }
-    .movie-card > img {
-      width: 100%;
-      height: auto;
+      > img {
+        width: 100%;
+        height: auto;
+      }
+      > .movie-title {
+        line-height: 1.1;
+        padding: 0.8rem 1rem 1.6rem 1rem;
+        display: flex;
+        justify-content: space-between;
+        > .title {
+          font-size: 0.8rem;
+          font-weight: 600;
+        }
+        > .rating {
+          font-weight: 900;
+          font-size: 0.8rem;
+        }
+      }
     }
   `;
   static globalStyles = css`
