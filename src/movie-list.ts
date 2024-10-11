@@ -36,20 +36,31 @@ export class MovieList extends LitElement {
 
   render() {
     return html`
-      <div>
-        <a href="https://lit.dev" target="_blank">
-          <img src=${litLogo} class="logo lit" alt="Lit logo" />
-        </a>
+      <div class="movie-list-container">
+        <div class="side-bar">
+          <a href="https://lit.dev" target="_blank">
+            <img src=${litLogo} class="logo lit" alt="Lit logo" />
+          </a>
+        </div>
+        <ul class="movie-list">
+          ${this.movieList.map((movie) => this.getMovieCard(movie))}
+        </ul>
       </div>
-      <ul class="movie-list-container">
-        ${this.movieList.map((movie) => this.getMovieCard(movie))}
-      </ul>
     `;
   }
 
   static movieStyles = css`
     .movie-list-container {
       display: flex;
+      justify-content: center;
+      gap: 1rem;
+    }
+    .side-bar {
+      padding-right: 1rem;
+    }
+    .movie-list {
+      display: flex;
+      justify-content: center;
       flex-wrap: wrap;
       gap: 1.4rem;
     }
