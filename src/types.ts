@@ -17,7 +17,7 @@ declare global {
   }
 
   type MoviesResponse = EmptyResponse | MoviesFullResponse;
-  type MovieDetail = EmptyResponse | MovieFullDetail;
+  type MovieDetailType = EmptyResponse | MovieFullDetail;
 
   interface EmptyResponse {}
   interface MoviesFullResponse {
