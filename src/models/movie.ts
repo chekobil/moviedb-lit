@@ -2,7 +2,7 @@ import useAxios from "../services/useAxios";
 
 export const fetchMovieDetails = async (
   movieId: number
-): Promise<MovieDetail | EmptyResponse> => {
+): Promise<MovieDetailType | EmptyResponse> => {
   const url = `/movie/${movieId}`;
   try {
     const res = await useAxios(url);
