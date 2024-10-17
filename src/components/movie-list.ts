@@ -129,6 +129,7 @@ export class MovieList extends LitElement {
       --sidebar-width: 200px;
     }
     .movie-list-layout {
+      min-width: 100vw;
       display: flex;
       justify-content: center;
       gap: 1rem;
@@ -154,12 +155,10 @@ export class MovieList extends LitElement {
       max-width: var(--sidebar-width);
     }
     .movie-list-container {
+      flex: 1;
       display: flex;
       flex-direction: column;
       gap: 0;
-      > * {
-        border: 1px solid orange;
-      }
     }
     .movie-list {
       display: flex;
