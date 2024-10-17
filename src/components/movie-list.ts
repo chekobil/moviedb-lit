@@ -2,11 +2,19 @@ import { LitElement, PropertyValues, css, html } from "lit";
 import { customElement, property, state } from "lit/decorators.js";
 import litLogo from "../assets/lit.svg";
 
-import { fetchMovieList } from "../models/movies.ts";
+import { fetchMovieList, searchMovieList } from "../models/movies.ts";
 import { fetchMovieDetails } from "../models/movie.ts";
 
+import "./movie-search-ref.ts";
+import "./movie-search-query.ts";
 import "./movie-card.ts";
 import "./movie-detail.ts";
+
+declare global {
+  interface HTMLElementTagNameMap {
+    "movie-list": MovieList;
+  }
+}
 
 @customElement("movie-list")
 export class MovieList extends LitElement {
@@ -35,46 +43,83 @@ export class MovieList extends LitElement {
   #handleChangeMovie = async (event: CustomEvent) => {
     const movieId = event.detail.id;
     const response: MovieDetailType = await fetchMovieDetails(movieId);
-    if ("id" in response) this.movieDetailData = response;
+    if ("id" in response) {
+      this.movieDetailData = response;
+    }
   };
 
   protected async firstUpdated(
     _changedProperties: PropertyValues
   ): Promise<void> {
-    const response: MoviesResponse = await fetchMovieList();
-    if ("results" in response) this.movieList = response.results;
+    this.#handleFetchMovies();
   }
 
+  #handleFetchMovies = async () => {
+    const response: MoviesResponse = await fetchMovieList();
+    if ("results" in response) {
+      this.movieList = response.results;
+    }
+  };
+
+  #handleChangeQuery = async (event: CustomEvent) => {
+    const params = event.detail;
+    const results = await this.#handleSearchMovies(params);
+    if (!results?.length) return;
+    this.movieList = results;
+  };
+
+  #handleSearchMovies = async (query: SearchParams) => {
+    if (!query.query) {
+      this.#handleFetchMovies();
+    }
+    const response: MoviesResponse = await searchMovieList(query);
+    if ("results" in response) {
+      return response.results;
+    }
+  };
+
   render() {
-    return html`
-      <div class="movie-list-container">
-        <div class="side-bar">
-          <a href="https://lit.dev" target="_blank">
-            <img src=${litLogo} class="logo lit" alt="Lit logo" />
-          </a>
-        </div>
-        <div
-          class="${this._openDetail
-            ? "movie-detail-wrapper open"
-            : "movie-detail-wrapper"}"
-        >
+    let movieDetailHtml: any = "";
+    if (this._openDetail) {
+      movieDetailHtml = html`
+        <div class="movie-detail-wrapper">
           <movie-detail
             .movie="${this.movieDetailData}"
             @close-detail=${this.#handleCloseDetail}
           >
           </movie-detail>
         </div>
+      `;
+    }
 
-        <ul class="movie-list">
-          ${this.movieList.map(
-            (movie) => html`
-              <movie-card
-                .movie=${movie}
-                @change-movie=${this.#handleChangeMovie}
-              ></movie-card>
-            `
-          )}
-        </ul>
+    return html`
+      <div class="movie-list-layout">
+        <div class="side-bar">
+          <a href="https://lit.dev" target="_blank">
+            <img src=${litLogo} class="logo lit" alt="Lit logo" />
+          </a>
+        </div>
+
+        ${movieDetailHtml}
+
+        <div class="movie-list-container">
+          <movie-search-ref
+            @change=${this.#handleChangeQuery}
+          ></movie-search-ref>
+          <movie-search-query
+            @change=${this.#handleChangeQuery}
+          ></movie-search-query>
+          <ul class="movie-list">
+            ${this.movieList.map(
+              (movie) => html`
+                <movie-card
+                  .movie=${movie}
+                  @change-movie=${this.#handleChangeMovie}
+                ></movie-card>
+              `
+            )}
+          </ul>
+        </div>
       </div>
     `;
   }
@@ -83,7 +128,7 @@ export class MovieList extends LitElement {
     :host {
       --sidebar-width: 200px;
     }
-    .movie-list-container {
+    .movie-list-layout {
       display: flex;
       justify-content: center;
       gap: 1rem;
@@ -93,7 +138,7 @@ export class MovieList extends LitElement {
       overflow: hidden;
     }
     .movie-detail-wrapper {
-      display: none;
+      display: block;
       position: fixed;
       z-index: 3;
       top: 0;
@@ -102,14 +147,19 @@ export class MovieList extends LitElement {
       right: 0;
       bottom: 0;
       background-color: rgba(255, 255, 255, 0.99);
-      &.open {
-        display: block;
-      }
     }
     .side-bar {
       padding-right: 1rem;
       min-width: var(--sidebar-width);
       max-width: var(--sidebar-width);
+    }
+    .movie-list-container {
+      display: flex;
+      flex-direction: column;
+      gap: 0;
+      > * {
+        border: 1px solid orange;
+      }
     }
     .movie-list {
       display: flex;
@@ -141,10 +191,4 @@ export class MovieList extends LitElement {
     }
   `;
   static styles = [MovieList.globalStyles, MovieList.movieStyles];
-}
-
-declare global {
-  interface HTMLElementTagNameMap {
-    "movie-list": MovieList;
-  }
 }
