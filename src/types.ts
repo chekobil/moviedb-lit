@@ -1,4 +1,14 @@
 declare global {
+  interface FetchParams {
+    sort_by?: string;
+    year?: number;
+    with_keywords?: string;
+  }
+
+  interface SearchParams {
+    query: string;
+  }
+
   interface Movie {
     adult: boolean;
     backdrop_path: string;
